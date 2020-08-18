@@ -146,11 +146,6 @@ const initialState = {
     getNetworkError: null,
     getNetworkRequestAttempt: false,
     getNetworkResponse: null,
-    // Ping
-    getPingError: null,
-    getPingRequestAttempt: false,
-    getPingResponse: null,
-    pingTimer: null,
     // StakeInfo
     getStakeInfoError: null,
     getStakeInfoRequestAttempt: false,
@@ -419,7 +414,9 @@ const initialState = {
     addInvoiceAttempt: false,
     sendPaymentAttempt: false,
     scbPath: "",
-    scbUpdatedTime: 0
+    scbUpdatedTime: 0,
+    nodeInfo: null,
+    getNodeInfoAttempt: false
   },
   locales: locales
 };

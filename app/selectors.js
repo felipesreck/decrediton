@@ -178,6 +178,7 @@ export const getAccountsResponse = get(["grpc", "getAccountsResponse"]);
 export const getNetworkResponse = get(["grpc", "getNetworkResponse"]);
 export const getNetworkError = get(["grpc", "getNetworkError"]);
 export const getAccountMixerRunning = get(["grpc", "accountMixerRunning"]);
+export const getAccountMixerError = get(["grpc", "mixerStreamerError"]);
 
 // accounts is a selector representing accountsList from gRPC response.
 export const accounts = createSelector([getAccountsResponse], (r) =>
@@ -319,7 +320,7 @@ export const ticketNormalizer = createSelector(
   [network, accounts, chainParams, txURLBuilder, blockURLBuilder],
   (network, accounts, chainParams, txURLBuilder, blockURLBuilder) => {
     return (ticket) => {
-      const { txType, status, spender, blockHash, rawTx, isStake } = ticket;
+      const { txType, status, spender, blockHash, rawTx, isStake, timestamp } = ticket;
       // TODO refactor same code to be used in tickets and regular tx normalizers.
       const findAccount = (num) =>
         accounts.find((account) => account.getAccountNumber() === num);
@@ -328,8 +329,8 @@ export const ticketNormalizer = createSelector(
       const txInputs = [];
       const txOutputs = [];
       const hasSpender = spender && spender.getHash();
-      const isVote = status === "voted";
-      const isPending = status === "unmined";
+      const isVote = status === VOTED;
+      const isPending = !timestamp;
       const ticketTx = ticket.ticket;
       const spenderTx = hasSpender ? spender : null;
       const txBlockHash = blockHash
@@ -1507,13 +1508,16 @@ export const trezorWalletCreationMasterPubkeyAttempt = get([
 ]);
 
 export const lnEnabled = bool(
-  and(get(["ln", "enabled"]), not(isWatchingOnly), not(isTrezor), not(isSPV))
+  and(not(isWatchingOnly), not(isTrezor))
 );
 export const lnActive = bool(get(["ln", "active"]));
 export const lnStartupStage = get(["ln", "startupStage"]);
 export const lnStartAttempt = bool(get(["ln", "startAttempt"]));
 export const lnWalletExists = bool(get(["ln", "exists"]));
 export const lnInfo = get(["ln", "info"]);
+export const lnNetwork = get(["ln", "network"]);
+export const lnGetNodeInfoAttempt = bool(get(["ln", "getNodeInfoAttempt"]));
+export const lnNodeInfo = get(["ln", "nodeInfo"]);
 export const lnWalletBalances = get(["ln", "walletBalances"]);
 export const lnChannelBalances = get(["ln", "channelBalances"]);
 export const lnChannels = get(["ln", "channels"]);

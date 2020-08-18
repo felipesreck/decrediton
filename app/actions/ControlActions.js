@@ -151,7 +151,7 @@ export const IMPORTSCRIPT_SUCCESS = "IMPORTSCRIPT_SUCCESS";
 
 // importScriptAttempt tries to import the given script into the wallet. It will
 // throw an exception in case of errors.
-export const importScriptAttempt = (passphrase, script) => async (
+export const importScriptAttempt = (script) => async (
   dispatch,
   getState
 ) => {
@@ -160,7 +160,6 @@ export const importScriptAttempt = (passphrase, script) => async (
   try {
     const importScriptResponse = await wallet.importScript(
       walletService,
-      passphrase,
       script
     );
     dispatch({ importScriptResponse, type: IMPORTSCRIPT_SUCCESS });
@@ -182,11 +181,11 @@ export const IMPORTSCRIPT_MANUAL_FAILED = "IMPORTSCRIPT_MANUAL_FAILED";
 // meant as a step during some other operation (eg: linking to a stakepool).
 //
 // This function always initiates a complete wallet rescan in case of success.
-export const manualImportScriptAttempt = (passphrase, script) => async (
+export const manualImportScriptAttempt = (script) => async (
   dispatch
 ) => {
   try {
-    await dispatch(importScriptAttempt(passphrase, script));
+    await dispatch(importScriptAttempt(script));
     dispatch({ type: IMPORTSCRIPT_MANUAL_SUCCESS });
     dispatch(rescanAttempt(0));
   } catch (error) {
@@ -318,7 +317,7 @@ export const purchaseTicketsAttempt = (
       // If we need to sign the tx, we re-import the script to ensure the
       // wallet will control the ticket.
       const importScriptResponse = await dispatch(
-        importScriptAttempt(passphrase, stakepool.Script)
+        importScriptAttempt(stakepool.Script)
       );
       if (importScriptResponse.getP2shAddress() !== stakepool.TicketAddress) {
         throw new Error(
@@ -608,9 +607,8 @@ export const validateMasterPubKey = (masterPubKey) => (dispatch) => {
   }
 };
 
-export const validateAddressCleanStore = () => (dispatch) => {
+export const validateAddressCleanStore = (dispatch) =>
   dispatch({ type: VALIDATEADDRESS_CLEANSTORE });
-};
 
 export const SIGNMESSAGE_ATTEMPT = "SIGNMESSAGE_ATTEMPT";
 export const SIGNMESSAGE_FAILED = "SIGNMESSAGE_FAILED";
@@ -632,7 +630,8 @@ export function signMessageAttempt(address, message, passphrase) {
   };
 }
 
-export const signMessageCleanStore = () => ({ type: SIGNMESSAGE_CLEANSTORE });
+export const signMessageCleanStore = (dispatch) =>
+  dispatch({ type: SIGNMESSAGE_CLEANSTORE });
 
 export const VERIFYMESSAGE_ATTEMPT = "VERIFYMESSAGE_ATTEMPT";
 export const VERIFYMESSAGE_FAILED = "VERIFYMESSAGE_FAILED";
@@ -656,9 +655,8 @@ export function verifyMessageAttempt(address, message, signature) {
   };
 }
 
-export const verifyMessageCleanStore = () => ({
-  type: VERIFYMESSAGE_CLEANSTORE
-});
+export const verifyMessageCleanStore = (dispatch) =>
+  dispatch({ type: VERIFYMESSAGE_CLEANSTORE });
 
 export const PUBLISHUNMINEDTRANSACTIONS_ATTEMPT =
   "PUBLISHUNMINEDTRANSACTIONS_ATTEMPT";
